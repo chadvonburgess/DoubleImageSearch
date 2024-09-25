@@ -11,6 +11,13 @@ import androidx.datastore.preferences.core.Preferences
 import coil.ImageLoader
 import com.cvb.myapplication.datastorage.HistorySaver
 
+
+interface ISApplicationComponentProvider {
+    fun getRepo(): ImgurRepository
+    fun getHistorySaver(): HistorySaver
+    fun getImageLoader(): ImageLoader
+}
+
 //@HiltAndroidApp
 class ISApplication(): Application(), ISApplicationComponentProvider {
     internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "HISTORY_STORE")
@@ -51,10 +58,4 @@ class ISApplication(): Application(), ISApplicationComponentProvider {
     override fun getImageLoader(): ImageLoader {
         return AppModule.provideImageLoader(this) // can make this singleton
     }
-}
-
-interface ISApplicationComponentProvider {
-    fun getRepo(): ImgurRepository
-    fun getHistorySaver(): HistorySaver
-    fun getImageLoader(): ImageLoader
 }

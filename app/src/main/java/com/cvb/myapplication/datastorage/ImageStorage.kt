@@ -16,6 +16,16 @@ data class SavedSearches(val searches: MutableMap<String, List<ImgurRepoImage>> 
 data class SavedFavorites(val favorites: MutableSet<ImgurRepoImage> = mutableSetOf())
 
 
+interface HistorySaver {
+    // note could be further abstracted but we should probably start small
+    suspend fun saveSearch(query: String,  results : List<ImgurRepoImage>)
+    suspend fun recallSearch(query: String): List<ImgurRepoImage>
+    suspend fun getSearches(): Set<String>
+    suspend fun getFavorites() : List<ImgurRepoImage>
+    suspend fun addFavorite(image :ImgurRepoImage)
+    suspend fun removeFavorite(image :ImgurRepoImage)
+}
+
 class HistorySaverImpl(val dataStore: DataStore<androidx.datastore.preferences.core.Preferences>): HistorySaver {
     val GSON = Gson()
     override suspend fun saveSearch(query: String, results: List<ImgurRepoImage>) {
@@ -128,14 +138,3 @@ class HistorySaverImpl(val dataStore: DataStore<androidx.datastore.preferences.c
     }
 
 }
-
-interface HistorySaver {
-    // note could be further abstracted but we should probably start small
-    suspend fun saveSearch(query: String,  results : List<ImgurRepoImage>)
-    suspend fun recallSearch(query: String): List<ImgurRepoImage>
-    suspend fun getSearches(): Set<String>
-    suspend fun getFavorites() : List<ImgurRepoImage>
-    suspend fun addFavorite(image :ImgurRepoImage)
-    suspend fun removeFavorite(image :ImgurRepoImage)
-}
-

@@ -1,10 +1,7 @@
 package com.cvb.myapplication.application
 
-import android.app.Application
-import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.preferencesDataStore
 import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.request.CachePolicy
@@ -19,13 +16,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
-import java.util.prefs.Preferences
 import javax.inject.Singleton
 
 @Module

@@ -92,7 +92,7 @@ fun SearchScreen(searchViewModel: SearchViewModel = viewModel(factory = SearchVi
                 ) {
 
                     Text(
-                        text = "Double Barrel Image Search", // Replace with your title
+                        text = "Double Image Search", // Replace with your title
                         style = MaterialTheme.typography.headlineSmall, // Customize style as needed
                         modifier = Modifier
                             .padding(bottom = 80.dp)
