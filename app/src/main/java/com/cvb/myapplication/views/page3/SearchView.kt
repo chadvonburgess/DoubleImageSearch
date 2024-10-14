@@ -1,5 +1,6 @@
-package com.cvb.myapplication.views
+package com.cvb.myapplication.views.page3
 
+//import com.cvb.myapplication.datastorage.ImageStorageImage
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -27,10 +26,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cvb.myapplication.views.FullScreenImage
+import com.cvb.myapplication.views.ImageGallery
+import com.cvb.myapplication.views.Selector
 
 
 val HOST_CONST = "https://i.imgur.com/"
@@ -51,6 +51,7 @@ fun SearchScreen(searchViewModel: SearchViewModel = viewModel(factory = SearchVi
     //obfuscate eventually
     val sortOptions = listOf("time", "viral", "top")
     val windowOptions = listOf("day", "week", "month", "year", "all")
+
 
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = {
@@ -88,8 +89,6 @@ fun SearchScreen(searchViewModel: SearchViewModel = viewModel(factory = SearchVi
                 )
             } else {
                 // Entry Box (TextField)
-                val keyboardController = LocalSoftwareKeyboardController.current
-
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
@@ -108,22 +107,6 @@ fun SearchScreen(searchViewModel: SearchViewModel = viewModel(factory = SearchVi
                         value = queryText,
                         onValueChange = { newText -> searchViewModel.onQueryTextChange(newText) },
                         label = { Text("Enter Image to Search for") },
-                        singleLine = true,
-                        maxLines = 1,
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Done // Set the IME action to "Done" or "Enter"
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                // Handle the Enter key being pressed
-                               // Optionally hide the keyboard
-                                // Perform your action here, like submitting the form
-                                searchViewModel.onSearchClick()
-                            },
-                            onPrevious = {
-                                keyboardController?.hide()
-                            }
-                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(16.dp))

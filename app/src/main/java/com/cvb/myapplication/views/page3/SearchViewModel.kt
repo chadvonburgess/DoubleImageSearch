@@ -1,4 +1,4 @@
-package com.cvb.myapplication.views
+package com.cvb.myapplication.views.page3
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

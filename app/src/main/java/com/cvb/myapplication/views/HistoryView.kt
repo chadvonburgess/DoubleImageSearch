@@ -71,6 +71,7 @@ fun HistoryScreen(viewModel: HistoryViewModel = viewModel(factory = HistoryViewM
                         viewModel::decrementPage,
                         viewModel::incrementPage,
                         viewModel.imageLoader(),
+                        viewModel::incrementPage,
                         false
                     )
                 } else {

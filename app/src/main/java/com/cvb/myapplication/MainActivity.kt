@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Build
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.BottomAppBar
@@ -40,6 +41,7 @@ import androidx.navigation.compose.rememberNavController
 import com.cvb.myapplication.ui.theme.ImageSearcherTheme
 import com.cvb.myapplication.views.HistoryScreen
 import com.cvb.myapplication.views.SearchScreen
+import com.cvb.myapplication.views.page4.CheckoutPage
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,6 +97,12 @@ fun Navigations(navController: NavHostController) {
         composable(TabNavItem.Search2.route) {
             SearchScreen()
         }
+        composable(TabNavItem.Job1.route) {
+            CheckoutPage()
+        }
+        composable(TabNavItem.Job2.route) {
+            CheckoutPage()
+        }
     }
 }
 
@@ -113,6 +121,9 @@ sealed class TabNavItem(var route: String, val icon: ImageVector?, var title: St
         object Search1 : TabNavItem("Search1", Icons.Rounded.Search, "Search")
         object History : TabNavItem("History", Icons.Rounded.List, "Favorites")
         object Search2 : TabNavItem("Search2", Icons.Rounded.Search, "Search2")
+        object Job1 : TabNavItem("Job", Icons.Rounded.Build, "Job")
+        object Job2 : TabNavItem("Job2", Icons.Rounded.Build, "Job2")
+
 }
 
 
@@ -122,7 +133,8 @@ fun BottomNavigationBar(navController: NavController) {
         TabNavItem.Search1,
         TabNavItem.History,
         TabNavItem.Search2,
-    )
+        TabNavItem.Job1,
+        )
     var selectedItem by remember { mutableStateOf(0) }
     var currentRoute by remember { mutableStateOf(TabNavItem.Search1.route) }
 

@@ -9,11 +9,11 @@ import retrofit2.http.Query
 
 interface ImgurAPI {
 
-    @Headers("Authorization: Client-ID {clientID}") // move eventually
+    @Headers("Authorization: Client-ID b067d5cb828ec5a") // move eventually
     @GET("https://api.imgur.com/3/gallery/search/")
     suspend fun getImageListBasic(@Query("q_any") query: String): List<String>
 
-    @Headers("Authorization: Client-ID {clientID}") // move eventually
+    @Headers("Authorization: Client-ID b067d5cb828ec5a") // move eventually
     @GET("https://api.imgur.com/3/gallery/search/{sort}/{window}/{page}")
     suspend fun getImageListInclusive(
          @Path("sort") sort: String = "time",

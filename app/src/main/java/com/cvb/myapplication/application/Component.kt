@@ -10,6 +10,7 @@ import com.cvb.myapplication.api.ImgurRepository
 import com.cvb.myapplication.api.ImgurRepositoryImpl
 import com.cvb.myapplication.datastorage.HistorySaver
 import com.cvb.myapplication.datastorage.HistorySaverImpl
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,6 +32,7 @@ object AppModule {
         return Retrofit.Builder()
             .baseUrl("https://api.example.com/")
             .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(getClient())
             .build()
     }

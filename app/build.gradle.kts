@@ -65,10 +65,13 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.generativeai)
     implementation("com.squareup.okhttp3:okhttp:4.9.3") // Use the appropriate version
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
 //    implementation("androidx.datastore:datastore:1.1.1")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
+
     //    implementation("com.squareup.retrofit2:converter-gson")
 //    implementation(libs.retrofit.converter.gson)
 //    implementation(libs.retrofit)

@@ -2,6 +2,7 @@ package com.cvb.myapplication.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,9 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -28,14 +32,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.ImageLoader
@@ -82,6 +93,11 @@ fun FullScreenImage(
     onClose: () -> Unit,
     setFavorite: (ImgurRepoImage) -> Unit
 ) {
+
+
+
+    var scale by remember { mutableStateOf(1f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
     Dialog(onDismissRequest = onClose) {
         Card(
             modifier = Modifier
@@ -93,7 +109,27 @@ fun FullScreenImage(
                 contentDescription = "Full Screen Image",
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable { onClose() }, // Close on click
+                    .clickable { onClose() }
+                    .graphicsLayer(
+                        scaleX = scale,
+                        scaleY = scale,
+                        translationX = offset.x,
+                        translationY = offset.y
+                    )
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, pan, zoom, _ ->
+                            scale = (scale * zoom).coerceIn(1f, 5f)
+                            val maxX = (size.width * (scale - 1)) / 2
+                            val maxY = (size.height * (scale - 1)) / 2
+                            val newOffset = offset + pan
+                            offset = Offset(
+                                x = newOffset.x.coerceIn(-maxX, maxX),
+                                y = newOffset.y.coerceIn(-maxY, maxY)
+                            )
+                        }
+                    }
+
+                , // Close on click
                 contentScale = ContentScale.FillBounds,
                 imageLoader = imageLoader
             )
@@ -117,6 +153,10 @@ fun FullScreenImage(
     }
 }
 
+
+private val buffer = 2 // load more when scroll reaches last n item, where n >= 1
+
+
 @Composable
 fun ImageGallery(
     images: List<ImgurRepoImage>,
@@ -127,24 +167,47 @@ fun ImageGallery(
     decrementPage: () -> Unit,
     incrementPage: () -> Unit,
     imageLoader: ImageLoader,
-    ifShowNextArrows: Boolean = true
+    loadMore: () -> Unit,
+    ifShowNextArrows: Boolean = false
 ) {
+
+    val listState = rememberLazyListState()
+
+
+    val reachedBottom: Boolean by remember {
+        derivedStateOf {
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+            lastVisibleItem?.index != 0 && lastVisibleItem?.index == listState.layoutInfo.totalItemsCount - buffer
+        }
+    }
+
+    LaunchedEffect(reachedBottom) {
+        println("reached this state")
+        if (reachedBottom) loadMore()
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) { // Use a Box
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+
+            LazyColumn(
+//                columns = GridCells.Fixed(2),
+                state = listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(0.dp, 32.dp, 0.dp, 0.dp)
             ) {
-                items(images) { image ->
-                    ImageCard(imageLoader, image, onClick = {
-                        onImageClicked(image)
+
+                items(
+                    images.size,
+                    key = {  images[it].id }
+                ) { card ->
+                    ImageCard(imageLoader, images[card], onClick = {
+                        onImageClicked(images[card])
                     }, setFavorite = {
-                        onFavoriteAdded(image)
+                        onFavoriteAdded(images[card])
                     }, removeFavorite = {
-                        onFavoriteRemoved(image)
+                        onFavoriteRemoved(images[card])
                     })
                 }
             }
@@ -200,13 +263,16 @@ fun ImageCard(
             .fillMaxWidth()
             .padding(4.dp)
     ) {
-        Column {
-            // needs to be moved
+        Box(modifier = Modifier.fillMaxWidth()) {
+            val configuration = LocalConfiguration.current
+            val screenHeight = configuration.screenHeightDp / 3
+
             val find = toFind(image.type)
             val link = if (find.isNotEmpty()) {
-                // note refactor
-                val removed =
-                    image.link.removeRange(image.link.length - find.length, image.link.length)
+                val removed = image.link.removeRange(
+                    image.link.length - find.length,
+                    image.link.length
+                )
                 val added = removed + "m" + find
                 added
             } else {
@@ -217,15 +283,25 @@ fun ImageCard(
                 contentDescription = "Image",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
+                    .height(screenHeight.dp)
                     .clickable { onClick.invoke() },
                 contentScale = ContentScale.Crop,
                 imageLoader = imageLoader
             )
 
-            Row(
+            Row( // This Row is now positioned within the Box
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally),
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()// Align to bottom center
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.23f),
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.73f),
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.93f)
+                            )
+                        )
+                    ),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 IconButton(onClick = { setFavorite(image) }) {
@@ -236,7 +312,6 @@ fun ImageCard(
                     Icon(Icons.Filled.Share, contentDescription = "Share")
                 }
             }
-
         }
     }
 }
