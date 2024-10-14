@@ -47,7 +47,6 @@ fun SearchScreen(searchViewModel: SearchViewModel = viewModel(factory = SearchVi
     val selectedWindow by searchViewModel.selectedWindow.collectAsState()
     val selectedPage by searchViewModel.selectedSort.collectAsState()
 
-
     //obfuscate eventually
     val sortOptions = listOf("time", "viral", "top")
     val windowOptions = listOf("day", "week", "month", "year", "all")
